@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ลองเช็คความเครียดของคุณ · แบบประเมิน ST-5</title>
+<meta name="description" content="แบบประเมินความเครียด ST-5 กรมสุขภาพจิต 5 ข้อ ใช้เวลาไม่ถึง 1 นาที ไม่ต้องกรอกข้อมูลส่วนตัว" />
+<meta name="color-scheme" content="light" />
+<meta name="theme-color" content="#BFE6DA" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@600;700&family=Sarabun:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg-1: #D9EFE7;
+    --bg-2: #BFE6DA;
+    --card: #F4FBF8;
+    --ink: #1E6B59;
+    --ink-soft: #3E7A6B;
+    --mint: #55B695;
+    --melon: #EE9A4D;
+
+    --lv-low: #55B695;
+    --lv-mid: #E8C35A;
+    --lv-high: #EE9A4D;
+    --lv-max: #D9633C;
+
+    --radius: 22px;
+    --radius-sm: 14px;
+    --shadow: 0 18px 40px -22px rgba(30, 107, 89, 0.45);
+    --shadow-soft: 0 8px 22px -16px rgba(30, 107, 89, 0.5);
+
+    --font-display: "Anuphan", system-ui, -apple-system, sans-serif;
+    --font-body: "Sarabun", system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    background-attachment: fixed;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, .display { font-family: var(--font-display); font-weight: 700; }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px calc(28px + env(safe-area-inset-bottom));
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ---------- Screens ---------- */
+  .screen { display: none; animation: fade 0.35s ease both; }
+  .screen.active { display: block; }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- Intro ---------- */
+  .intro { text-align: center; }
+  .intro .leaf-art { margin: 0 auto 18px; display: block; }
+  .intro h1 {
+    font-size: clamp(1.7rem, 6.5vw, 2.15rem);
+    margin: 0 0 12px;
+    line-height: 1.25;
+  }
+  .intro .sub {
+    color: var(--ink-soft);
+    font-size: 1rem;
+    margin: 0 auto 26px;
+    max-width: 20em;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(85, 182, 149, 0.14);
+    color: var(--ink);
+    font-weight: 500;
+    border-radius: 999px;
+    padding: 7px 15px;
+    font-size: 0.9rem;
+    margin-bottom: 22px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.12rem;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 28px;
+    min-height: 54px;
+    width: 100%;
+    cursor: pointer;
+    color: #fff;
+    background: var(--mint);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover { filter: brightness(1.04); }
+  .btn:active { transform: translateY(1px) scale(0.99); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    box-shadow: none;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 1rem;
+    min-height: 48px;
+    padding: 12px;
+    width: auto;
+  }
+  .btn-ghost:hover { filter: none; color: var(--ink); }
+
+  /* ---------- Question screen ---------- */
+  .q-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .q-note {
+    color: var(--ink-soft);
+    font-size: 0.86rem;
+    margin: 0;
+    flex: 1;
+  }
+  .q-count {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--mint);
+    white-space: nowrap;
+  }
+
+  .progress {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(85, 182, 149, 0.18);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress > span {
+    display: block;
+    height: 100%;
+    width: 20%;
+    border-radius: 999px;
+    background: var(--mint);
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .question {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.3rem, 5.5vw, 1.6rem);
+    line-height: 1.35;
+    margin: 0 0 24px;
+    min-height: 2.7em;
+    display: flex;
+    align-items: center;
+  }
+
+  .options { display: grid; gap: 12px; }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    width: 100%;
+    min-height: 56px;
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    border: 2px solid rgba(85, 182, 149, 0.25);
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .opt:hover { border-color: var(--mint); background: #F4FBF8; }
+  .opt:active { transform: scale(0.985); }
+  .opt.selected { border-color: var(--mint); background: rgba(85, 182, 149, 0.12); }
+  .opt .dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(85, 182, 149, 0.45);
+    flex: 0 0 auto;
+    position: relative;
+    transition: border-color 0.18s ease;
+  }
+  .opt.selected .dot { border-color: var(--mint); }
+  .opt.selected .dot::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--mint);
+  }
+
+  .q-back { margin-top: 20px; text-align: center; }
+  .q-back .btn-ghost { display: inline-flex; align-items: center; gap: 6px; }
+  .q-back[hidden] { display: none; }
+
+  /* ---------- Result ---------- */
+  .result { text-align: center; }
+  .result .art { margin: 0 auto 6px; display: block; }
+  .score-ring {
+    margin: 4px auto 18px;
+    position: relative;
+    width: 150px; height: 150px;
+  }
+  .score-ring svg { transform: rotate(-90deg); display: block; }
+  .score-ring .track { stroke: rgba(30, 107, 89, 0.1); }
+  .score-ring .meter {
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1);
+  }
+  .score-ring .center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+  .score-den { font-size: 0.95rem; color: var(--ink-soft); margin-top: 2px; }
+
+  .level-name {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: #fff;
+    border-radius: 999px;
+    padding: 8px 22px;
+    margin-bottom: 18px;
+  }
+
+  .level-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.12rem;
+    line-height: 1.4;
+    margin: 0 0 12px;
+  }
+  .level-advice {
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    line-height: 1.7;
+    margin: 0 auto 4px;
+    max-width: 26em;
+  }
+
+  /* ---------- Hotline ---------- */
+  .hotline {
+    margin: 24px 0 4px;
+    background: linear-gradient(150deg, #FBE3CB 0%, #F6CFA4 100%);
+    border-radius: var(--radius-sm);
+    padding: 20px 18px;
+    text-align: center;
+  }
+  .hotline .hl-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #9A4A1E;
+    font-size: 1rem;
+    margin: 0 0 4px;
+  }
+  .hotline .hl-num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2rem;
+    color: #B5481B;
+    letter-spacing: 2px;
+    margin: 2px 0 14px;
+  }
+  .btn-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--lv-max);
+    text-decoration: none;
+  }
+  .hotline .hl-sub {
+    color: #9A4A1E;
+    font-size: 0.85rem;
+    margin: 12px 0 0;
+  }
+
+  .result .restart { margin-top: 26px; }
+
+  .credit {
+    margin-top: 22px;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  .credit p { margin: 2px 0; }
+
+  /* ---------- a11y ---------- */
+  :focus-visible {
+    outline: 3px solid #1E6B59;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ SCREEN 1: INTRO ============ -->
+  <section id="screen-intro" class="screen active" aria-labelledby="intro-title">
+    <div class="card intro">
+      <!-- leaf / heart art -->
+      <svg class="leaf-art" width="76" height="76" viewBox="0 0 76 76" fill="none" aria-hidden="true">
+        <circle cx="38" cy="38" r="38" fill="#55B695" opacity="0.14"/>
+        <path d="M38 56s-15-9.6-19.5-19.2C15 29 18.6 22 25.6 22c4.6 0 7.6 2.6 9.4 5.4C36.8 24.6 39.8 22 44.4 22c7 0 10.6 7 7.1 14.8C47 46.4 38 56 38 56Z" fill="#55B695"/>
+        <path d="M48 30c0 6-5 11-11 13" stroke="#F4FBF8" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
+      </svg>
+
+      <h1 id="intro-title">ลองเช็คความเครียดของคุณ</h1>
+      <p class="sub">แบบประเมินความเครียดง่ายๆ เพื่อทำความเข้าใจใจของตัวเองในวันนี้</p>
+      <span class="pill">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.4" stroke="#1E6B59" stroke-width="1.4"/>
+          <path d="M8 4.6V8l2.2 1.6" stroke="#1E6B59" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        แบบประเมิน ST-5 · 5 ข้อ ใช้เวลาไม่ถึง 1 นาที
+      </span>
+      <button class="btn" id="start-btn" type="button">เริ่มเลย</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2: QUESTIONS ============ -->
+  <section id="screen-quiz" class="screen" aria-labelledby="quiz-question">
+    <div class="card">
+      <div class="q-head">
+        <p class="q-note">ในช่วง 1 เดือนที่ผ่านมา คุณมีอาการเหล่านี้บ่อยแค่ไหน</p>
+        <span class="q-count" id="q-count" aria-hidden="true">1/5</span>
+      </div>
+      <div class="progress"><span id="q-bar"></span></div>
+
+      <h2 class="question" id="quiz-question" aria-live="polite"></h2>
+
+      <div class="options" id="options" role="group" aria-label="ตัวเลือกคำตอบ"></div>
+
+      <div class="q-back" id="q-back" hidden>
+        <button class="btn-ghost" id="back-btn" type="button">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          ย้อนกลับ
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3: RESULT ============ -->
+  <section id="screen-result" class="screen" aria-labelledby="result-title">
+    <div class="card result">
+      <div id="result-art"></div>
+
+      <div class="score-ring">
+        <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true">
+          <circle class="track" cx="75" cy="75" r="64" fill="none" stroke-width="12"/>
+          <circle class="meter" id="ring-meter" cx="75" cy="75" r="64" fill="none" stroke-width="12"
+                  stroke-dasharray="402" stroke-dashoffset="402"/>
+        </svg>
+        <div class="center">
+          <span class="score-num" id="score-num">0</span>
+          <span class="score-den">จาก 15</span>
+        </div>
+      </div>
+
+      <span class="level-name" id="level-name"></span>
+      <h2 class="level-title" id="result-title"></h2>
+      <p class="level-advice" id="level-advice"></p>
+
+      <!-- hotline (shown when score >= 8) -->
+      <div class="hotline" id="hotline" hidden>
+        <p class="hl-label">หากต้องการใครสักคนรับฟัง โทรปรึกษาได้ตลอด</p>
+        <p class="hl-num">1323</p>
+        <a class="btn btn-call" id="call-btn" href="tel:1323">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M6.2 3.3 7.8 6.3c.2.5.1 1-.3 1.4l-1 1c.7 1.6 2 2.9 3.6 3.6l1-1c.4-.4.9-.5 1.4-.3l3 1.6c.5.3.7.9.5 1.4l-.7 1.7c-.3.6-.9 1-1.6.9C8 17.2 2.8 12 2.1 5.3c-.1-.7.3-1.3.9-1.6l1.7-.7c.6-.2 1.2 0 1.5.5Z" fill="#fff"/>
+          </svg>
+          โทร 1323
+        </a>
+        <p class="hl-sub">สายด่วนสุขภาพจิต กรมสุขภาพจิต โทรฟรี 24 ชม.</p>
+      </div>
+
+      <button class="btn restart" id="restart-btn" type="button">ทำใหม่อีกครั้ง</button>
+
+      <div class="credit">
+        <p>อ้างอิงแบบประเมินความเครียด (ST-5) — กรมสุขภาพจิต กระทรวงสาธารณสุข</p>
+        <p>เป็นการคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัยโรค</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var QUESTIONS = [
+    "มีปัญหาการนอน นอนไม่หลับหรือนอนมาก",
+    "มีสมาธิน้อยลง",
+    "หงุดหงิด / กระวนกระวาย / วุ่นวายใจ",
+    "รู้สึกเบื่อ เซ็ง",
+    "ไม่อยากพบปะผู้คน"
+  ];
+
+  var CHOICES = [
+    { label: "แทบไม่มี", value: 0 },
+    { label: "บางครั้ง", value: 1 },
+    { label: "บ่อยครั้ง", value: 2 },
+    { label: "เป็นประจำ", value: 3 }
+  ];
+
+  // 4 ระดับผล — เรียงจากสบายใจ → ต้องดูแล
+  var LEVELS = [
+    {
+      min: 0, max: 4,
+      name: "เครียดน้อย",
+      color: "#55B695",
+      title: "ความเครียดอยู่ในระดับน้อย คุณดูแลใจตัวเองได้ดีอยู่แล้ว",
+      advice: "รักษาสมดุลแบบนี้ไว้ — นอนให้พอ ขยับร่างกายสม่ำเสมอ และให้เวลากับสิ่งและคนที่ทำให้สบายใจ",
+      hotline: false,
+      art: "leaf"
+    },
+    {
+      min: 5, max: 7,
+      name: "เครียดปานกลาง",
+      color: "#E8C35A",
+      title: "ความเครียดอยู่ในเกณฑ์ปกติ พบได้ในชีวิตประจำวัน",
+      advice: "ลองหาเวลาผ่อนคลายให้ตัวเอง — หายใจเข้าออกช้าๆ ลึกๆ, ขยับร่างกายบ้าง, นอนให้พอ และพูดคุยกับคนที่ไว้ใจเมื่อรู้สึกอึดอัด",
+      hotline: false,
+      art: "breath"
+    },
+    {
+      min: 8, max: 9,
+      name: "เครียดมาก",
+      color: "#EE9A4D",
+      title: "ความเครียดเริ่มอยู่ในระดับสูง และอาจส่งผลต่ออารมณ์และร่างกาย",
+      advice: "ลองจัดการอย่างจริงจัง — หากิจกรรมผ่อนคลาย ออกกำลังกาย พักให้พอ และอย่าลืมพูดคุยกับคนที่ไว้ใจ หากยังไม่ดีขึ้น การปรึกษาผู้เชี่ยวชาญด้านสุขภาพจิตจะช่วยได้มาก",
+      hotline: true,
+      art: "hand"
+    },
+    {
+      min: 10, max: 15,
+      name: "เครียดมากที่สุด",
+      color: "#D9633C",
+      title: "ความเครียดอยู่ในระดับสูงมาก",
+      advice: "คุณไม่จำเป็นต้องรับมือกับมันอยู่คนเดียว การพูดคุยกับผู้เชี่ยวชาญด้านสุขภาพจิตคือก้าวที่ดีและปลอดภัยที่สุดในตอนนี้ ลองโทรปรึกษาสายด่วนด้านล่างได้เลย",
+      hotline: true,
+      art: "hand"
+    }
+  ];
+
+  var ART = {
+    leaf:
+      '<svg class="art" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+      '<circle cx="32" cy="32" r="32" fill="#55B695" opacity="0.14"/>' +
+      '<path d="M22 44c0-12 8-20 20-22-2 12-8 20-20 22Z" fill="#55B695"/>' +
+      '<path d="M24 42c4-7 9-11 16-13" stroke="#F4FBF8" stroke-width="2.2" stroke-linecap="round"/>' +
+      '</svg>',
+    breath:
+      '<svg class="art" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+      '<circle cx="32" cy="32" r="32" fill="#E8C35A" opacity="0.18"/>' +
+      '<circle cx="32" cy="32" r="9" fill="#E8C35A"/>' +
+      '<circle cx="32" cy="32" r="16" stroke="#E8C35A" stroke-width="2" opacity="0.6"/>' +
+      '<circle cx="32" cy="32" r="23" stroke="#E8C35A" stroke-width="2" opacity="0.3"/>' +
+      '</svg>',
+    hand:
+      '<svg class="art" width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true">' +
+      '<circle cx="32" cy="32" r="32" fill="#EE9A4D" opacity="0.16"/>' +
+      '<path d="M32 46s-12-7.7-15.6-15.4C13.8 25 16.7 19.4 22.3 19.4c3.7 0 6 2 7.5 4.3 1.5-2.3 3.8-4.3 7.5-4.3 5.6 0 8.5 5.6 5.8 11.2C39.8 38.3 32 46 32 46Z" fill="#EE9A4D"/>' +
+      '</svg>'
+  };
+
+  var RING_CIRC = 2 * Math.PI * 64; // ~402
+
+  // ---------- state (in-memory only) ----------
+  var answers = [];      // value per question
+  var current = 0;       // current question index
+
+  // ---------- elements ----------
+  var $ = function (id) { return document.getElementById(id); };
+  var screens = {
+    intro: $("screen-intro"),
+    quiz: $("screen-quiz"),
+    result: $("screen-result")
+  };
+
+  function show(name) {
+    Object.keys(screens).forEach(function (k) {
+      screens[k].classList.toggle("active", k === name);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- quiz rendering ----------
+  function renderQuestion() {
+    $("quiz-question").textContent = QUESTIONS[current];
+    $("q-count").textContent = (current + 1) + "/5";
+    $("q-bar").style.width = ((current + 1) / QUESTIONS.length * 100) + "%";
+    $("q-back").hidden = current === 0;
+
+    var box = $("options");
+    box.innerHTML = "";
+    CHOICES.forEach(function (choice) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "opt" + (answers[current] === choice.value ? " selected" : "");
+      btn.setAttribute("aria-pressed", answers[current] === choice.value ? "true" : "false");
+      btn.innerHTML = '<span class="dot" aria-hidden="true"></span><span>' + choice.label + "</span>";
+      btn.addEventListener("click", function () { choose(choice.value); });
+      box.appendChild(btn);
+    });
+  }
+
+  function choose(value) {
+    answers[current] = value;
+    if (current < QUESTIONS.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function back() {
+    if (current > 0) {
+      current--;
+      renderQuestion();
+    }
+  }
+
+  // ---------- result ----------
+  function levelFor(score) {
+    for (var i = 0; i < LEVELS.length; i++) {
+      if (score >= LEVELS[i].min && score <= LEVELS[i].max) return LEVELS[i];
+    }
+    return LEVELS[LEVELS.length - 1];
+  }
+
+  function showResult() {
+    var score = answers.reduce(function (a, b) { return a + b; }, 0);
+    var lv = levelFor(score);
+
+    $("result-art").innerHTML = ART[lv.art] || "";
+    $("score-num").textContent = score;
+
+    var nameEl = $("level-name");
+    nameEl.textContent = lv.name;
+    nameEl.style.background = lv.color;
+
+    $("result-title").textContent = lv.title;
+    $("level-advice").textContent = lv.advice;
+
+    // ring
+    var meter = $("ring-meter");
+    meter.style.stroke = lv.color;
+    var offset = RING_CIRC * (1 - score / 15);
+    // reset then animate
+    meter.style.strokeDashoffset = RING_CIRC;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        meter.style.strokeDashoffset = offset;
+      });
+    });
+
+    $("hotline").hidden = !lv.hotline;
+
+    show("result");
+  }
+
+  function restart() {
+    answers = [];
+    current = 0;
+    renderQuestion();
+    show("intro");
+  }
+
+  // ---------- wire up ----------
+  $("start-btn").addEventListener("click", function () {
+    renderQuestion();
+    show("quiz");
+  });
+  $("back-btn").addEventListener("click", back);
+  $("restart-btn").addEventListener("click", restart);
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
